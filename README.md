@@ -4,23 +4,41 @@ An experimental hashing algorithm for optical/quantum computers based on Toffoli
 
 This repository contains both Python and Rust implementations of the Mirror256 hash function, a reversible (bijective) hash function based on quantum-inspired logic gates.
 
-## Algorithm
+## Hashing Algorithm
 
-Mirror256 processes input data in 32-byte chunks, applying 128 layers of Toffoli and Fredkin gates arranged in a zigzag pattern:
+The Mirror-Hash algorithm has the following characteristics:
 
-```
-Layer structure (zigzag):
-1    ### @@@
-2    ###
-3    ### @@@
-4        @@@
-5    ### @@@
-6    ###
-7    ### @@@
-8        @@@
-```
+- Standard 256-bit input
+- 128 layers of gates
+- Each layer has 2 sublayers of Toffoli or Fredkin gates in zig-zag fashion
+- The symmetry (mirrored or not) and type of gate (Toffoli or Fredkin) is determined by the previous block (called layer encoding here) of the hash
+- XOR operation with the current layer encoding to avoid 0-to-0 hashes
 
-Each gate's type (Toffoli or Fredkin) and symmetry (regular or mirrored) is determined by the previous hash block (layer encoding). The function XORs with the current layer encoding to avoid 0-to-0 hashes.
+### Gate Grid Specification
+
+| Gate type | Symbol | Encoding |
+|-----------|--------|----------|
+| Toffoli   |   #    |    00    |
+| Mirrored Toffoli   |   #̅   |    01    |
+| Fredkin   |   @    |    10    |
+| Mirrored Fredkin   |   @̅   |    11    |
+
+| Layer | Column 1 | Column 2 | Column 3 | Column 4 | Column 5 | Column 6 | Column 7 | Column 8 |
+|-------|----------|----------|----------|----------|----------|----------|----------|----------|
+|   1   |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |
+|   2   |   ###    |          |   ###    |          |   ###    |          |   ###    |          |
+|   3   |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |
+|   4   |          |   @@@    |          |   @@@    |          |   @@@    |          |   @@@    |
+|   5   |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |
+|   6   |   ###    |          |   ###    |          |   ###    |          |   ###    |          |
+|   7   |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |
+|   8   |          |   @@@    |          |   @@@    |          |   @@@    |          |   @@@    |
+|  ...  |   ...    |    ...   |    ...   |    ...   |    ...   |    ...   |    ...   |    ...   |
+|  128  |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |   ###    |   @@@    |
+
+### Algorithm Implementation
+
+Mirror256 processes input data in 32-byte chunks, applying 128 layers of Toffoli and Fredkin gates arranged in a zigzag pattern. Each gate's type (Toffoli or Fredkin) and symmetry (regular or mirrored) is determined by the previous hash block (layer encoding). The function XORs with the current layer encoding to avoid 0-to-0 hashes.
 
 ## Features
 
